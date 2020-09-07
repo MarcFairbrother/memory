@@ -14,6 +14,14 @@ const score = {
   computer: 0,
 };
 
+export function newTurn() {
+  if (isHumanTurn) {
+    humanTurn();
+  } else {
+    computerTurn();
+  }
+}
+
 function endGame() {
   if (score.human > score.computer) {
     alert('You win!');
@@ -27,33 +35,34 @@ function endGame() {
 async function compare() {
   let playerType;
   let board;
-  // remove event listener while comparing cards
+  // 1. set variables depending on who's turn it is
   if (isHumanTurn) {
     playerType = 'human';
     board = humanScoreBoard;
+    // 2. remove click event listener while comparing cards
     cards.removeEventListener('click', handleFlipClick);
   } else {
     playerType = 'computer';
     board = compScoreBoard;
   }
   if (currentTurn[0].name === currentTurn[1].name) {
-    // remove cards from knowledge as they are no longer in play
+    // 3. if cards match, remove them from knowledge as they are no longer in play
     currentTurn.forEach((card) => {
       const i = knowledge.discovered.findIndex((item) => item.id === card.id);
       knowledge.discovered.splice(i, 1);
     });
-    // increment score
+    // 4. and increment the current player's score
     score[playerType] += 1;
     board.querySelector(
       '.player__score'
     ).innerHTML = `Score: ${score[playerType]}`;
-    // check if game should be ended
+    // 5. check if game should be ended
     if (score.human + score.computer === playDeck.length / 2) {
       endGame();
     }
   } else {
     await wait(1000);
-    // flip cards back
+    // 6. if the cards don't match, flip them back
     currentTurn.forEach((card) => {
       const targetEl = cards.querySelector(
         `.card__recto[data-id="${card.id}"]`
@@ -62,10 +71,12 @@ async function compare() {
       targetEl.removeAttribute('data-id');
       targetEl.parentElement.classList.remove('flipped');
     });
-    // change player
+    // 7. switch current player
     isHumanTurn = !isHumanTurn;
   }
+  // 8. empty currentTurn array for next turn
   currentTurn = [];
+  // 9. if the game is not over, begin a new turn
   if (score.human + score.computer !== playDeck.length / 2) {
     await wait(500);
     newTurn();
@@ -73,17 +84,18 @@ async function compare() {
 }
 
 function updateKnowledge(flippedCardPosition) {
-  // check if the card has already been added to the computer's knowledge
+  // 1. check if the card has already been added to the computer's knowledge
   const isDiscovered = knowledge.discovered.some(
     (card) => card.position === flippedCardPosition
   );
-  // if not, add to discovered and remove from unknowns
   if (!isDiscovered) {
+    // 2. if not, add the card to discovered
     knowledge.discovered.push({
       position: flippedCardPosition,
       name: playDeck[flippedCardPosition].name,
       id: playDeck[flippedCardPosition].id,
     });
+    // 3. and remove the card from unknowns
     const i = knowledge.unknowns.indexOf(flippedCardPosition);
     knowledge.unknowns.splice(i, 1);
   }
@@ -91,12 +103,16 @@ function updateKnowledge(flippedCardPosition) {
 
 async function flip(parent) {
   const parentPosition = parseInt(parent.dataset.position);
+  // 1. update knowledge with new data
   updateKnowledge(parentPosition);
+  // 2. update UI to show flipped card
   parent.classList.add('flipped');
   const recto = parent.querySelector('.card__recto');
   recto.innerHTML = playDeck[parentPosition].name;
   recto.setAttribute('data-id', playDeck[parentPosition].id);
+  // 3. add data of latest flipped card to currentTurn array
   currentTurn.push(playDeck[parentPosition]);
+  // 4. if currentTurn holds two items, compare them
   if (currentTurn.length === 2) {
     compare();
   }
@@ -117,7 +133,6 @@ function computerFlip(position) {
 }
 
 async function computerTurn() {
-  console.log('computer turn');
   // 1. check knowledge for existing pairs
   const match = searchForPair(knowledge.discovered, 'name');
   if (match) {
@@ -128,14 +143,14 @@ async function computerTurn() {
     computerFlip(match[1].position);
   } else {
     // 3. if no existing pairs are found, store current discovered cards
-    const currentDiscovered = [...knowledge.discovered];
+    const previousKnowledge = [...knowledge.discovered];
     // 4. flip a random card from the unknowns
     let position =
       knowledge.unknowns[Math.floor(Math.random() * knowledge.unknowns.length)];
     await wait(Math.ceil(Math.random() * 250) + 300);
     computerFlip(position);
-    // 5. check for a matching card in knowledge
-    const matchingCard = currentDiscovered.filter(
+    // 5. check for a matching card in previous knowledge
+    const matchingCard = previousKnowledge.filter(
       (card) =>
         card.name === knowledge.discovered[knowledge.discovered.length - 1].name
     );
@@ -155,16 +170,10 @@ async function computerTurn() {
   }
 }
 
-export function newTurn() {
-  if (isHumanTurn) {
-    humanTurn();
-  } else {
-    computerTurn();
-  }
-}
-
 function deal() {
+  // 1. create new play deck from source
   playDeck = shuffle([...srcDeck]);
+  // 2. build HTML for play deck
   const cardsHTML = [];
   playDeck.forEach((card, i) => {
     cardsHTML.push(
@@ -181,8 +190,9 @@ function deal() {
 }
 
 export function newGame() {
+  // 1. set up new play deck
   deal();
-  // reset game settings
+  // 2. reset game settings
   isHumanTurn = true;
   currentTurn = [];
   knowledge.discovered = [];
@@ -191,4 +201,6 @@ export function newGame() {
   humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
   score.computer = 0;
   compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
+  // 3. begin game
+  newTurn();
 }

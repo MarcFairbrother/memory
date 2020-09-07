@@ -26,4 +26,6 @@ export function searchForPair(data, prop) {
 }
 
 // helper function waits for the amount of milliseconds passed to resolve a promise
-export const wait = (ms = 0) => new Promise((res) => setTimeout(res, ms));
+export function wait(ms = 0) {
+  return new Promise((res) => setTimeout(res, ms));
+}
