@@ -12,5 +12,8 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.4",
     "sass": "^1.26.10"
-  }
+  },
+  "browserslist": [
+    "last 1 chrome versions"
+  ]
 }
