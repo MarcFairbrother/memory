@@ -118,6 +118,8 @@ async function flip(parent) {
   }
 }
 
+// human turn is mainly listening for click events on the cards
+
 function handleFlipClick(e) {
   if (e.target.name !== 'flip') return;
   flip(e.target.parentElement);
@@ -126,6 +128,8 @@ function handleFlipClick(e) {
 function humanTurn() {
   cards.addEventListener('click', handleFlipClick);
 }
+
+// computer turn is hevaily scripted to implement strategy
 
 function computerFlip(position) {
   const target = document.querySelector(`[data-position="${position}"]`);
