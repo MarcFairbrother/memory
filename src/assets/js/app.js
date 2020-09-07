@@ -1,6 +1,12 @@
-import deck from './deck';
-import { shuffle } from './utils';
+import { playBtn } from './elements';
+import { newGame, newTurn } from './lib';
 
-const shuffledDeck = shuffle(deck);
+function handlePlayClick() {
+  newGame();
+  newTurn();
+}
 
-console.table({ deck, shuffledDeck });
+newGame();
+newTurn();
+
+playBtn.addEventListener('click', handlePlayClick);

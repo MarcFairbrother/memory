@@ -1,4 +1,4 @@
-const deck = [
+const srcDeck = [
   { name: 'cat', id: 1 },
   { name: 'cat', id: 2 },
   { name: 'dog', id: 3 },
@@ -13,4 +13,4 @@ const deck = [
   { name: 'bat', id: 12 },
 ];
 
-export default deck;
+export default srcDeck;
