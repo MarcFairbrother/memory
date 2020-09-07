@@ -14,7 +14,7 @@ const score = {
   computer: 0,
 };
 
-export function newTurn() {
+function newTurn() {
   if (isHumanTurn) {
     humanTurn();
   } else {
@@ -30,6 +30,41 @@ function endGame() {
   } else {
     alert('Draw!');
   }
+}
+
+function deal() {
+  // 1. create new play deck from source
+  playDeck = shuffle([...srcDeck]);
+  // 2. build HTML for play deck
+  const cardsHTML = [];
+  playDeck.forEach((card, i) => {
+    cardsHTML.push(
+      `<li 
+        class="card"
+        data-position="${i}" 
+        data-id="${card.id}">
+        <button class="card__verso" type="button" name="flip">${card.name}</button>
+        <span class="card__recto"></span>
+      </li>`
+    );
+  });
+  cards.innerHTML = cardsHTML.join('');
+}
+
+export function newGame() {
+  // 1. set up new play deck
+  deal();
+  // 2. reset game settings
+  isHumanTurn = true;
+  currentTurn = [];
+  knowledge.discovered = [];
+  knowledge.unknowns = playDeck.map((card, i) => i);
+  score.human = 0;
+  humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
+  score.computer = 0;
+  compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
+  // 3. begin game
+  newTurn();
 }
 
 async function compare() {
@@ -172,39 +207,4 @@ async function computerTurn() {
       computerFlip(matchingCard[0].position);
     }
   }
-}
-
-function deal() {
-  // 1. create new play deck from source
-  playDeck = shuffle([...srcDeck]);
-  // 2. build HTML for play deck
-  const cardsHTML = [];
-  playDeck.forEach((card, i) => {
-    cardsHTML.push(
-      `<li 
-        class="card"
-        data-position="${i}" 
-        data-id="${card.id}">
-        <button class="card__verso" type="button" name="flip">${card.name}</button>
-        <span class="card__recto"></span>
-      </li>`
-    );
-  });
-  cards.innerHTML = cardsHTML.join('');
-}
-
-export function newGame() {
-  // 1. set up new play deck
-  deal();
-  // 2. reset game settings
-  isHumanTurn = true;
-  currentTurn = [];
-  knowledge.discovered = [];
-  knowledge.unknowns = playDeck.map((card, i) => i);
-  score.human = 0;
-  humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
-  score.computer = 0;
-  compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
-  // 3. begin game
-  newTurn();
 }
