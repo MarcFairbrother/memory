@@ -1,0 +1,10 @@
+$tablet-width: 768px;
+$desktop-width: 1024px;
+$large-width: 1400px;
+$very-large: 1650px;
+
+@mixin breakpoint($width) {
+  @media only screen and (min-width: $width) {
+    @content;
+  }
+}

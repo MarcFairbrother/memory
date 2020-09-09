@@ -1,0 +1,23 @@
+.newgame {
+  text-align: center;
+  &__button {
+    background: none;
+    border: solid 2px var(--secondary-color);
+    border-radius: 4px;
+    color: inherit;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 10px 20px;
+    margin: 20px 0 40px;
+    transition: all 0.2s ease-in-out;
+    &:hover:not([disabled]) {
+      background: var(--secondary-color);
+      color: var(--main-color);
+      cursor: pointer;
+    }
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+.player {
+  &__board {
+    grid-row: 2;
+    &--human {
+      grid-column: 1;
+      @include breakpoint($desktop-width) {
+        grid-column: 2;
+      }
+    }
+    &--computer {
+      grid-column: 2;
+      justify-self: end;
+      text-align: right;
+      @include breakpoint($desktop-width) {
+        grid-column: 3;
+      }
+    }
+  }
+  &__type {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    @include breakpoint($desktop-width) {
+      font-size: 1.25rem;
+    }
+  }
+  &__score {
+    font-size: 0.75rem;
+    @include breakpoint($desktop-width) {
+      font-size: 1rem;
+    }
+  }
+}

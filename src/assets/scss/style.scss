@@ -1,6 +1,6 @@
-body {
-  background: black;
-  & h1 {
-    color: whitesmoke;
-  }
+@import '_breakpoints', 'globals', 'figures', 'layout', 'cards', 'card',
+  'newgame', 'player', 'endgame';
+
+:root {
+  --rotateY: 0;
 }
