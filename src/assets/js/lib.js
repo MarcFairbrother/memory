@@ -1,6 +1,13 @@
 import srcDeck from './deck';
 import { shuffle, searchForPair, wait } from './utils';
-import { cards, humanScoreBoard, compScoreBoard } from './elements';
+import {
+  cards,
+  humanScoreBoard,
+  compScoreBoard,
+  playBtn,
+  endgameModal,
+  endgameStatus,
+} from './elements';
 
 let isHumanTurn = true;
 let playDeck;
@@ -22,14 +29,20 @@ function newTurn() {
   }
 }
 
-function endGame() {
+async function endGame() {
+  let status;
   if (score.human > score.computer) {
-    alert('You win!');
+    status = 'Congrats, you win!';
   } else if (score.computer > score.human) {
-    alert('Computer wins!');
+    status = 'You lose, better luck next time!';
   } else {
-    alert('Draw!');
+    status = 'Draw!';
   }
+  endgameStatus.innerHTML = status;
+  endgameModal.classList.add('endgame--visible');
+  playBtn.disabled = false;
+  await wait(1500);
+  endgameModal.classList.remove('endgame--visible');
 }
 
 function deal() {
@@ -43,7 +56,7 @@ function deal() {
         class="card"
         data-position="${i}" 
         data-id="${card.id}">
-        <button class="card__verso" type="button" name="flip">${card.name}</button>
+        <button class="card__verso" type="button" name="flip"></button>
         <span class="card__recto"></span>
       </li>`
     );
@@ -63,7 +76,9 @@ export function newGame() {
   humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
   score.computer = 0;
   compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
-  // 3. begin game
+  // 3. disable play button
+  playBtn.disabled = true;
+  // 4. begin game
   newTurn();
 }
 
@@ -104,6 +119,7 @@ async function compare() {
       );
       targetEl.innerHTML = '';
       targetEl.removeAttribute('data-id');
+      targetEl.removeAttribute('style');
       targetEl.parentElement.classList.remove('flipped');
     });
     // 7. switch current player
@@ -144,6 +160,10 @@ async function flip(parent) {
   parent.classList.add('flipped');
   const recto = parent.querySelector('.card__recto');
   recto.innerHTML = playDeck[parentPosition].name;
+  recto.setAttribute(
+    'style',
+    `--img: var(${playDeck[parentPosition].illustration});`
+  );
   recto.setAttribute('data-id', playDeck[parentPosition].id);
   // 3. add data of latest flipped card to currentTurn array
   currentTurn.push(playDeck[parentPosition]);
