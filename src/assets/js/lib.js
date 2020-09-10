@@ -45,16 +45,13 @@ async function endGame() {
   endgameModal.classList.remove('endgame--visible');
 }
 
-function deal() {
-  // 1. create new play deck from source
-  playDeck = shuffle([...srcDeck]);
-  // 2. build HTML for play deck
+function insertCards() {
   const cardsHTML = [];
   playDeck.forEach((card, i) => {
     cardsHTML.push(
-      `<li 
+      `<li
         class="card"
-        data-position="${i}" 
+        data-position="${i}"
         data-id="${card.id}">
         <button class="card__verso" type="button" name="flip"></button>
         <span class="card__recto"></span>
@@ -62,6 +59,55 @@ function deal() {
     );
   });
   cards.innerHTML = cardsHTML.join('');
+}
+
+async function repositionCards(previous, next) {
+  previous.forEach((card, i) => {
+    const nextIndex = next.findIndex((newCard) => newCard.id === card.id);
+    // 1. select on page elements corresponding to previous and next position
+    const current = cards.querySelector(`[data-position="${i}"]`);
+    const target = cards.querySelector(`[data-position="${nextIndex}"]`);
+    // 2. calculate x and y offset pprevious and next positions
+    const x = (current.offsetLeft - target.offsetLeft) * -1;
+    const y = (current.offsetTop - target.offsetTop) * -1;
+    // 3. translate each card to new position
+    current.setAttribute('style', `transform: translate(${x}px, ${y}px);`);
+  });
+  // 4. once cards are in their new position update DOM
+  await wait(500);
+  insertCards();
+}
+
+function deal() {
+  // 1. store data from current deck to reposition cards
+  const oldDeck = [...playDeck];
+  // 2. create new play deck from source
+  playDeck = shuffle([...srcDeck]);
+  // 3. flip cards face down then reposition them
+  cards.childNodes.forEach((card) => card.classList.remove('flipped'));
+  cards.addEventListener(
+    'transitionend',
+    () => repositionCards(oldDeck, playDeck),
+    { once: true }
+  );
+}
+
+export function newGame() {
+  // 1. set up new play deck
+  deal();
+  // 2. reset game settings
+  isHumanTurn = true;
+  currentTurn = [];
+  knowledge.discovered = [];
+  knowledge.unknowns = playDeck.map((card, i) => i);
+  score.human = 0;
+  humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
+  score.computer = 0;
+  compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
+  // 3. disable play button
+  playBtn.disabled = true;
+  // 4. begin game
+  newTurn();
 }
 
 export function presentCards() {
@@ -81,24 +127,6 @@ export function presentCards() {
     );
   });
   cards.innerHTML = cardsHTML.join('');
-}
-
-export function newGame() {
-  // 1. set up new play deck
-  deal();
-  // 2. reset game settings
-  isHumanTurn = true;
-  currentTurn = [];
-  knowledge.discovered = [];
-  knowledge.unknowns = playDeck.map((card, i) => i);
-  score.human = 0;
-  humanScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
-  score.computer = 0;
-  compScoreBoard.querySelector('.player__score').innerHTML = 'Score: 0';
-  // 3. disable play button
-  playBtn.disabled = true;
-  // 4. begin game
-  newTurn();
 }
 
 async function compare() {
