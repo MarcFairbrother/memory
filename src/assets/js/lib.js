@@ -64,6 +64,25 @@ function deal() {
   cards.innerHTML = cardsHTML.join('');
 }
 
+export function presentCards() {
+  // 1. create new play deck from source
+  playDeck = shuffle([...srcDeck]);
+  // 2. build HTML to present the cards face up
+  const cardsHTML = [];
+  playDeck.forEach((card, i) => {
+    cardsHTML.push(
+      `<li 
+        class="card flipped"
+        data-position="${i}" 
+        data-id="${card.id}">
+        <button class="card__verso" type="button" name="flip"></button>
+        <span class="card__recto" style="--img: var(${card.illustration});"></span>
+      </li>`
+    );
+  });
+  cards.innerHTML = cardsHTML.join('');
+}
+
 export function newGame() {
   // 1. set up new play deck
   deal();

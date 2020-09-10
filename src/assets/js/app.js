@@ -1,10 +1,10 @@
 import { playBtn } from './elements';
-import { newGame } from './lib';
+import { newGame, presentCards } from './lib';
 
 function handlePlayClick() {
   newGame();
 }
 
-newGame();
+presentCards();
 
 playBtn.addEventListener('click', handlePlayClick);
