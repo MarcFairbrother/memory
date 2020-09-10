@@ -22,7 +22,12 @@ const score = {
 };
 
 function newTurn() {
-  if (isHumanTurn) {
+  // 1. reset array of cards for the new turn
+  currentTurn = [];
+  // 2. check if game should end, or the computer or player should take a new turn
+  if (score.human + score.computer === playDeck.length / 2) {
+    endGame();
+  } else if (isHumanTurn) {
     humanTurn();
   } else {
     computerTurn();
@@ -67,7 +72,7 @@ async function repositionCards(previous, next) {
     // 1. select on page elements corresponding to previous and next position
     const current = cards.querySelector(`[data-position="${i}"]`);
     const target = cards.querySelector(`[data-position="${nextIndex}"]`);
-    // 2. calculate x and y offset pprevious and next positions
+    // 2. calculate x and y offset between previous and next positions
     const x = (current.offsetLeft - target.offsetLeft) * -1;
     const y = (current.offsetTop - target.offsetTop) * -1;
     // 3. translate each card to new position
@@ -153,13 +158,9 @@ async function compare() {
     board.querySelector(
       '.player__score'
     ).innerHTML = `Score: ${score[playerType]}`;
-    // 5. check if game should be ended
-    if (score.human + score.computer === playDeck.length / 2) {
-      endGame();
-    }
   } else {
     await wait(1000);
-    // 6. if the cards don't match, flip them back
+    // 5. if the cards don't match, flip them back
     currentTurn.forEach((card) => {
       const targetEl = cards.querySelector(
         `.card__recto[data-id="${card.id}"]`
@@ -169,16 +170,12 @@ async function compare() {
       targetEl.removeAttribute('style');
       targetEl.parentElement.classList.remove('flipped');
     });
-    // 7. switch current player
+    // 6. switch current player
     isHumanTurn = !isHumanTurn;
   }
-  // 8. empty currentTurn array for next turn
-  currentTurn = [];
-  // 9. if the game is not over, begin a new turn
-  if (score.human + score.computer !== playDeck.length / 2) {
-    await wait(500);
-    newTurn();
-  }
+  // 7. begin a new turn
+  await wait(500);
+  newTurn();
 }
 
 function updateKnowledge(flippedCardPosition) {
