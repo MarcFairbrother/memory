@@ -2,6 +2,12 @@
 
 A vanilla JavaScript Memory game played by a person against a computer.
 
+## Tech and organization
+
+This project uses Parcel and SCSS.
+
+Each component is styled in its own .scss file.
+
 ## Project Setup
 
 ``` bash
