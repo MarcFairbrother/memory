@@ -11,7 +11,7 @@ import {
 
 let isHumanTurn = true;
 let playDeck;
-let currentTurn = [];
+let selection = [];
 const knowledge = {
   discovered: [],
   unknowns: [],
@@ -23,7 +23,7 @@ const score = {
 
 function newTurn() {
   // 1. reset array of cards for the new turn
-  currentTurn = [];
+  selection = [];
   // 2. check if game should end, or the computer or player should take a new turn
   if (score.human + score.computer === playDeck.length / 2) {
     endGame();
@@ -102,7 +102,7 @@ export function newGame() {
   deal();
   // 2. reset game settings
   isHumanTurn = true;
-  currentTurn = [];
+  selection = [];
   knowledge.discovered = [];
   knowledge.unknowns = playDeck.map((card, i) => i);
   score.human = 0;
@@ -135,41 +135,26 @@ export function presentCards() {
 }
 
 async function compare() {
-  let playerType;
-  let board;
   // 1. set variables depending on who's turn it is
-  if (isHumanTurn) {
-    playerType = 'human';
-    board = humanScoreBoard;
-    // 2. remove click event listener while comparing cards
-    cards.removeEventListener('click', handleFlipClick);
-  } else {
-    playerType = 'computer';
-    board = compScoreBoard;
-  }
-  if (currentTurn[0].name === currentTurn[1].name) {
+  let playerType = isHumanTurn ? 'human' : 'computer';
+  let board = isHumanTurn ? humanScoreBoard : compScoreBoard;
+  let scoreEl = board.querySelector('.player__score');
+  // 2. remove click event listener while comparing cards
+  isHumanTurn ? cards.removeEventListener('click', handleFlipClick) : null;
+  if (selection[0].name === selection[1].name) {
     // 3. if cards match, remove them from knowledge as they are no longer in play
-    currentTurn.forEach((card) => {
+    selection.forEach((card) => {
       const i = knowledge.discovered.findIndex((item) => item.id === card.id);
       knowledge.discovered.splice(i, 1);
     });
     // 4. and increment the current player's score
     score[playerType] += 1;
-    board.querySelector(
-      '.player__score'
-    ).innerHTML = `Score: ${score[playerType]}`;
+    scoreEl.innerHTML = `Score: ${score[playerType]}`;
   } else {
     await wait(1000);
     // 5. if the cards don't match, flip them back
-    currentTurn.forEach((card) => {
-      const targetEl = cards.querySelector(
-        `.card__recto[data-id="${card.id}"]`
-      );
-      targetEl.innerHTML = '';
-      targetEl.removeAttribute('data-id');
-      targetEl.removeAttribute('style');
-      targetEl.parentElement.classList.remove('flipped');
-    });
+    flipBack(cards.querySelector(`.card__recto[data-id="${selection[0].id}"]`));
+    flipBack(cards.querySelector(`.card__recto[data-id="${selection[1].id}"]`));
     // 6. switch current player
     isHumanTurn = !isHumanTurn;
   }
@@ -209,12 +194,19 @@ async function flip(parent) {
     `--img: var(${playDeck[parentPosition].illustration});`
   );
   recto.setAttribute('data-id', playDeck[parentPosition].id);
-  // 3. add data of latest flipped card to currentTurn array
-  currentTurn.push(playDeck[parentPosition]);
-  // 4. if currentTurn holds two items, compare them
-  if (currentTurn.length === 2) {
+  // 3. add data of latest flipped card to selection array
+  selection.push(playDeck[parentPosition]);
+  // 4. if selection holds two items, compare them
+  if (selection.length === 2) {
     compare();
   }
+}
+
+function flipBack(target) {
+  target.innerHTML = '';
+  target.removeAttribute('data-id');
+  target.removeAttribute('style');
+  target.parentElement.classList.remove('flipped');
 }
 
 // human turn is mainly listening for click events on the cards
@@ -247,11 +239,11 @@ async function computerTurn() {
   } else {
     // 3. if no existing pairs are found, store current discovered cards
     const previousKnowledge = [...knowledge.discovered];
+    const unknownCards = knowledge.unknowns;
     // 4. flip a random card from the unknowns
-    let position =
-      knowledge.unknowns[Math.floor(Math.random() * knowledge.unknowns.length)];
+    let pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
     await wait(Math.ceil(Math.random() * 250) + 300);
-    computerFlip(position);
+    computerFlip(pos);
     // 5. check for a matching card in previous knowledge
     const matchingCard = previousKnowledge.filter(
       (card) =>
@@ -259,12 +251,9 @@ async function computerTurn() {
     );
     if (matchingCard.length === 0) {
       // 6. if no matching card exists, flip a random card from the unknowns
-      position =
-        knowledge.unknowns[
-          Math.floor(Math.random() * knowledge.unknowns.length)
-        ];
+      pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
       await wait(Math.ceil(Math.random() * 250) + 300);
-      computerFlip(position);
+      computerFlip(pos);
     } else {
       // 7. if a matching card exists, flip that card
       await wait(Math.ceil(Math.random() * 250) + 300);
