@@ -239,40 +239,65 @@ function computerFlip(position, gameSettings) {
   flip(target, gameSettings);
 }
 
-async function computerTurn(gameSettings) {
+// flips the two cards passed in the cards array
+async function computerFlipsMatchingCards(cards, settings) {
+  // 1. wait a random amount of time and flip first card
+  await randomWait(400, 800);
+  computerFlip(cards[0].position, settings);
+  // 2. wait a random amount of time and flip second card
+  await randomWait(400, 800);
+  computerFlip(cards[1].position, settings);
+}
+
+// flips a random card from the array of remaining unknown cards
+function computerFlipsRandomUnknownCard(settings) {
+  const unknownCards = settings.knowledge.unknowns;
+  const target = unknownCards[Math.floor(Math.random() * unknownCards.length)];
+  computerFlip(target, settings);
+}
+
+// filters previously known cards array for card matching latest discovered card
+function checkForMatchingCard(previousknowledge, { discovered }) {
+  const latestDiscovered = discovered[discovered.length - 1].name;
+  return previousknowledge.filter((card) => card.name === latestDiscovered);
+}
+
+// completes computer turn depending on if there's a match for the first randomly flipped card
+function computerCompletesTurn(matchingCard, settings) {
+  if (matchingCard.length === 0) {
+    // 1. if no matching card exists, wait then flip a random card from the unknowns
+    computerFlipsRandomUnknownCard(settings);
+  } else {
+    // 2. if a matching card exists, flip that card
+    computerFlip(matchingCard[0].position, settings);
+  }
+}
+
+// flips a random card then checks if computer has a matching card in memory and acts accordingly
+async function computerBeginsRandomTurn(settings) {
+  // 1. store current discovered cards
+  const previousKnowledge = [...settings.knowledge.discovered];
+  // 2. wait then flip a random card from the unknowns
+  await randomWait(400, 800);
+  computerFlipsRandomUnknownCard(settings);
+  // 3. check for a matching card in previous knowledge
+  const matchingCard = checkForMatchingCard(
+    previousKnowledge,
+    settings.knowledge
+  );
+  // 4. wait then complete turn
+  await randomWait(400, 800);
+  computerCompletesTurn(matchingCard, settings);
+}
+
+function computerTurn(gameSettings) {
   // 1. check knowledge for existing pairs
   const match = searchForPair(gameSettings.knowledge.discovered, 'name');
   if (match) {
     // 2. if existing pair is found, flip those cards
-    await randomWait(400, 800);
-    computerFlip(match[0].position, gameSettings);
-    await randomWait(400, 800);
-    computerFlip(match[1].position, gameSettings);
+    computerFlipsMatchingCards(match, gameSettings);
   } else {
-    // 3. if no existing pairs are found, store current discovered cards
-    const previousKnowledge = [...gameSettings.knowledge.discovered];
-    const unknownCards = gameSettings.knowledge.unknowns;
-    // 4. flip a random card from the unknowns
-    let pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
-    await randomWait(400, 800);
-    computerFlip(pos, gameSettings);
-    // 5. check for a matching card in previous knowledge
-    const matchingCard = previousKnowledge.filter(
-      (card) =>
-        card.name ===
-        gameSettings.knowledge.discovered[
-          gameSettings.knowledge.discovered.length - 1
-        ].name
-    );
-    if (matchingCard.length === 0) {
-      // 6. if no matching card exists, flip a random card from the unknowns
-      pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
-      await randomWait(400, 800);
-      computerFlip(pos, gameSettings);
-    } else {
-      // 7. if a matching card exists, flip that card
-      await randomWait(400, 800);
-      computerFlip(matchingCard[0].position, gameSettings);
-    }
+    // 3. if no existing pairs are found, computer takes a random turn
+    computerBeginsRandomTurn(gameSettings);
   }
 }
