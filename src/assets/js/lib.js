@@ -1,4 +1,4 @@
-import { shuffle, searchForPair, wait } from './utils';
+import { shuffle, searchForPair, wait, randomWait } from './utils';
 import {
   cards,
   humanScoreBoard,
@@ -244,9 +244,9 @@ async function computerTurn(gameSettings) {
   const match = searchForPair(gameSettings.knowledge.discovered, 'name');
   if (match) {
     // 2. if existing pair is found, flip those cards
-    await wait(Math.ceil(Math.random() * 250) + 300);
+    await randomWait(400, 800);
     computerFlip(match[0].position, gameSettings);
-    await wait(Math.ceil(Math.random() * 250) + 300);
+    await randomWait(400, 800);
     computerFlip(match[1].position, gameSettings);
   } else {
     // 3. if no existing pairs are found, store current discovered cards
@@ -254,7 +254,7 @@ async function computerTurn(gameSettings) {
     const unknownCards = gameSettings.knowledge.unknowns;
     // 4. flip a random card from the unknowns
     let pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
-    await wait(Math.ceil(Math.random() * 250) + 300);
+    await randomWait(400, 800);
     computerFlip(pos, gameSettings);
     // 5. check for a matching card in previous knowledge
     const matchingCard = previousKnowledge.filter(
@@ -267,11 +267,11 @@ async function computerTurn(gameSettings) {
     if (matchingCard.length === 0) {
       // 6. if no matching card exists, flip a random card from the unknowns
       pos = unknownCards[Math.floor(Math.random() * unknownCards.length)];
-      await wait(Math.ceil(Math.random() * 250) + 300);
+      await randomWait(400, 800);
       computerFlip(pos, gameSettings);
     } else {
       // 7. if a matching card exists, flip that card
-      await wait(Math.ceil(Math.random() * 250) + 300);
+      await randomWait(400, 800);
       computerFlip(matchingCard[0].position, gameSettings);
     }
   }

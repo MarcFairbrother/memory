@@ -25,7 +25,13 @@ export function searchForPair(data, prop) {
   return pair;
 }
 
-// helper function waits for the amount of milliseconds passed to resolve a promise
+// waits for the amount of milliseconds passed to resolve a promise
 export function wait(ms = 0) {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
+// waits for random amount of milliseconds between min and max values to resolve a promise
+export function randomWait(min = 0, max = 500) {
+  const ms = Math.ceil(Math.random() * (max - min) + min);
   return new Promise((res) => setTimeout(res, ms));
 }
