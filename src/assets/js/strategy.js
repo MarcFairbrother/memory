@@ -1,6 +1,7 @@
 import { randomWait } from './utils';
 import { flip } from './lib';
 
+// flips the card corresponding to the passed position
 function computerFlip(position, gameSettings) {
   const target = document.querySelector(`[data-position="${position}"]`);
   flip(target, gameSettings);
