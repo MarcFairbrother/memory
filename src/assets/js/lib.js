@@ -103,7 +103,6 @@ function insertCards(deck) {
   });
   // 2. insert HTML into DOM
   cards.innerHTML = cardsHTML.join('');
-  console.log(settings);
 }
 
 // begins a new human or computer turn, or ends game if all cards have been matched
