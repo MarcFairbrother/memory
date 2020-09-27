@@ -102,6 +102,7 @@ export function updateKnowledge(flippedCardPosition, gameSettings) {
   }
 }
 
+// TODO: refactor this to smaller functions
 // compares the two cards flipped this turn
 export async function compare(gameSettings) {
   // 1. set variables depending on who's turn it is
