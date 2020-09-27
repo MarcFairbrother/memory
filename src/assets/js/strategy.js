@@ -1,5 +1,5 @@
 import { randomWait } from './utils';
-import { flip } from './lib';
+import { flip } from './ui';
 
 // flips the card corresponding to the passed position
 function computerFlip(position, gameSettings) {
