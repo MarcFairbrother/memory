@@ -54,16 +54,16 @@ export function newGame(gameSettings) {
 }
 
 // builds a new shuffled deck
-function deal({ playDeck, srcDeck }) {
+function deal(settings) {
   // 1. store data from current deck to reposition cards
-  const oldDeck = [...playDeck];
+  const oldDeck = [...settings.playDeck];
   // 2. create new play deck from source
-  playDeck = shuffle([...srcDeck]);
+  settings.playDeck = shuffle([...settings.srcDeck]);
   // 3. flip cards face down then reposition them
   cards.childNodes.forEach((card) => card.classList.remove('flipped'));
   cards.addEventListener(
     'transitionend',
-    () => repositionCards(oldDeck, playDeck),
+    () => repositionCards(oldDeck, settings.playDeck),
     { once: true }
   );
 }
@@ -103,6 +103,7 @@ function insertCards(deck) {
   });
   // 2. insert HTML into DOM
   cards.innerHTML = cardsHTML.join('');
+  console.log(settings);
 }
 
 // begins a new human or computer turn, or ends game if all cards have been matched
