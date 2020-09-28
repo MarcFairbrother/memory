@@ -49,10 +49,7 @@ export async function computerBeginsRandomTurn(settings) {
   await randomWait(400, 800);
   computerFlipsRandomUnknownCard(settings);
   // 3. check for a matching card in previous knowledge
-  const matchingCard = checkForMatchingCard(
-    previousKnowledge,
-    settings.knowledge
-  );
+  const matchingCard = checkForMatchingCard(previousKnowledge, settings.knowledge);
   // 4. wait then complete turn
   await randomWait(400, 800);
   computerCompletesTurn(matchingCard, settings);

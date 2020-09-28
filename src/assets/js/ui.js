@@ -78,10 +78,7 @@ export async function flip(parent, gameSettings) {
   parent.classList.add('flipped');
   const recto = parent.querySelector('.card__recto');
   recto.innerHTML = gameSettings.playDeck[parentPosition].name;
-  recto.setAttribute(
-    'style',
-    `--img: var(${gameSettings.playDeck[parentPosition].illustration});`
-  );
+  recto.setAttribute('style', `--img: var(${gameSettings.playDeck[parentPosition].illustration});`);
   recto.setAttribute('data-id', gameSettings.playDeck[parentPosition].id);
   // 3. add data of latest flipped card to selection array
   gameSettings.selection.push(gameSettings.playDeck[parentPosition]);

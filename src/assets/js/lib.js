@@ -1,14 +1,6 @@
 import { shuffle, searchForPair, wait } from './utils';
-import {
-  repositionCards,
-  flip,
-  flipBackNonMatchingCards,
-  displayEndGameModal,
-} from './ui';
-import {
-  computerBeginsRandomTurn,
-  computerFlipsMatchingCards,
-} from './strategy';
+import { repositionCards, flip, flipBackNonMatchingCards, displayEndGameModal } from './ui';
+import { computerBeginsRandomTurn, computerFlipsMatchingCards } from './strategy';
 import { cards, humanScoreBoard, compScoreBoard, playBtn } from './elements';
 import settings from './settings';
 
@@ -39,11 +31,7 @@ function deal(settings) {
   settings.playDeck = shuffle([...settings.srcDeck]);
   // 3. flip cards face down then reposition them
   cards.childNodes.forEach((card) => card.classList.remove('flipped'));
-  cards.addEventListener(
-    'transitionend',
-    () => repositionCards(oldDeck, settings.playDeck),
-    { once: true }
-  );
+  cards.addEventListener('transitionend', () => repositionCards(oldDeck, settings.playDeck), { once: true });
 }
 
 // begins a new human or computer turn, or ends game if all cards have been matched
@@ -51,10 +39,7 @@ function newTurn(gameSettings) {
   // 1. reset array of cards for the new turn
   gameSettings.selection = [];
   // 2. check if game should end, or the computer or player should take a new turn
-  if (
-    gameSettings.score.human + gameSettings.score.computer ===
-    gameSettings.playDeck.length / 2
-  ) {
+  if (gameSettings.score.human + gameSettings.score.computer === gameSettings.playDeck.length / 2) {
     endGame(gameSettings);
   } else if (gameSettings.isHumanTurn) {
     humanTurn(gameSettings);
@@ -104,9 +89,7 @@ function computerTurn(gameSettings) {
 // updates knowledge base when new cards are revealed
 export function updateKnowledge(flippedCardPosition, gameSettings) {
   // 1. check if the card has already been added to the computer's knowledge
-  const isDiscovered = gameSettings.knowledge.discovered.some(
-    (card) => card.position === flippedCardPosition
-  );
+  const isDiscovered = gameSettings.knowledge.discovered.some((card) => card.position === flippedCardPosition);
   if (!isDiscovered) {
     // 2. if not, add the card to discovered
     gameSettings.knowledge.discovered.push({
@@ -123,9 +106,7 @@ export function updateKnowledge(flippedCardPosition, gameSettings) {
 // removes a matching pair of cards from the computer's knowledge base
 function removeCardsFromPlay(settings) {
   settings.selection.forEach((card) => {
-    const i = settings.knowledge.discovered.findIndex(
-      (item) => item.id === card.id
-    );
+    const i = settings.knowledge.discovered.findIndex((item) => item.id === card.id);
     settings.knowledge.discovered.splice(i, 1);
   });
 }
