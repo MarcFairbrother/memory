@@ -1,5 +1,10 @@
 import { shuffle, searchForPair, wait } from './utils';
-import { repositionCards, flip, flipBack, displayEndGameModal } from './ui';
+import {
+  repositionCards,
+  flip,
+  flipBackNonMatchingCards,
+  displayEndGameModal,
+} from './ui';
 import {
   computerBeginsRandomTurn,
   computerFlipsMatchingCards,
@@ -83,6 +88,19 @@ function handleFlipClick(e) {
   flip(e.target.parentElement, settings);
 }
 
+// computer turn is hevaily scripted to implement strategy
+function computerTurn(gameSettings) {
+  // 1. check knowledge for existing pairs
+  const match = searchForPair(gameSettings.knowledge.discovered, 'name');
+  if (match) {
+    // 2. if existing pair is found, flip those cards
+    computerFlipsMatchingCards(match, gameSettings);
+  } else {
+    // 3. if no existing pairs are found, computer takes a random turn
+    computerBeginsRandomTurn(gameSettings);
+  }
+}
+
 // updates knowledge base when new cards are revealed
 export function updateKnowledge(flippedCardPosition, gameSettings) {
   // 1. check if the card has already been added to the computer's knowledge
@@ -102,52 +120,48 @@ export function updateKnowledge(flippedCardPosition, gameSettings) {
   }
 }
 
-// TODO: refactor this to smaller functions
+// removes a matching pair of cards from the computer's knowledge base
+function removeCardsFromPlay(settings) {
+  settings.selection.forEach((card) => {
+    const i = settings.knowledge.discovered.findIndex(
+      (item) => item.id === card.id
+    );
+    settings.knowledge.discovered.splice(i, 1);
+  });
+}
+
+// increments the current player's score by one point
+function incrementScore({ isHumanTurn, score }) {
+  // 1. set variables depending on who's turn it is
+  const playerType = isHumanTurn ? 'human' : 'computer';
+  const board = isHumanTurn ? humanScoreBoard : compScoreBoard;
+  const scoreEl = board.querySelector('.player__score');
+  // 2. increment score in game settings
+  score[playerType] += 1;
+  // 3. update score UI
+  scoreEl.innerHTML = `Score: ${score[playerType]}`;
+}
+
 // compares the two cards flipped this turn
 export async function compare(gameSettings) {
-  // 1. set variables depending on who's turn it is
-  let playerType = gameSettings.isHumanTurn ? 'human' : 'computer';
-  let board = gameSettings.isHumanTurn ? humanScoreBoard : compScoreBoard;
-  let scoreEl = board.querySelector('.player__score');
-  // 2. remove click event listener while comparing cards
-  gameSettings.isHumanTurn
-    ? cards.removeEventListener('click', handleFlipClick)
-    : null;
+  // 1. if it's the player's turn remove click event listener while comparing cards
+  if (gameSettings.isHumanTurn) {
+    cards.removeEventListener('click', handleFlipClick);
+  }
+  // 2. check if the selected cards match
   if (gameSettings.selection[0].name === gameSettings.selection[1].name) {
     // 3. if cards match, remove them from knowledge as they are no longer in play
-    gameSettings.selection.forEach((card) => {
-      const i = gameSettings.knowledge.discovered.findIndex(
-        (item) => item.id === card.id
-      );
-      gameSettings.knowledge.discovered.splice(i, 1);
-    });
+    removeCardsFromPlay(gameSettings);
     // 4. and increment the current player's score
-    gameSettings.score[playerType] += 1;
-    scoreEl.innerHTML = `Score: ${gameSettings.score[playerType]}`;
+    incrementScore(gameSettings);
   } else {
     await wait(1000);
-    // 5. if the cards don't match, flip them back
-    gameSettings.selection.forEach((card) => {
-      const target = `.card__recto[data-id="${card.id}"]`;
-      flipBack(cards.querySelector(target));
-    });
+    // 5. if the selected cards don't match, flip them back;
+    flipBackNonMatchingCards(gameSettings);
     // 6. switch current player
     gameSettings.isHumanTurn = !gameSettings.isHumanTurn;
   }
   // 7. begin a new turn
   await wait(500);
   newTurn(gameSettings);
-}
-
-// computer turn is hevaily scripted to implement strategy
-function computerTurn(gameSettings) {
-  // 1. check knowledge for existing pairs
-  const match = searchForPair(gameSettings.knowledge.discovered, 'name');
-  if (match) {
-    // 2. if existing pair is found, flip those cards
-    computerFlipsMatchingCards(match, gameSettings);
-  } else {
-    // 3. if no existing pairs are found, computer takes a random turn
-    computerBeginsRandomTurn(gameSettings);
-  }
 }

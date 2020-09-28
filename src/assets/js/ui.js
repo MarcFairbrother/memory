@@ -91,10 +91,13 @@ export async function flip(parent, gameSettings) {
   }
 }
 
-// flips cards back down and removes all information
-export function flipBack(target) {
-  target.innerHTML = '';
-  target.removeAttribute('data-id');
-  target.removeAttribute('style');
-  target.parentElement.classList.remove('flipped');
+// flips a non matching pair of cards back down and removes all information
+export function flipBackNonMatchingCards({ selection }) {
+  selection.forEach((card) => {
+    const target = cards.querySelector(`.card__recto[data-id="${card.id}"]`);
+    target.innerHTML = '';
+    target.removeAttribute('data-id');
+    target.removeAttribute('style');
+    target.parentElement.classList.remove('flipped');
+  });
 }
