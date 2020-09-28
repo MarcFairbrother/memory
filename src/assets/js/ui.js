@@ -12,8 +12,7 @@ export function presentCards(gameSettings) {
     cardsHTML.push(
       `<li 
         class="card flipped"
-        data-position="${i}" 
-        data-id="${card.id}">
+        data-position="${i}">
         <button class="card__verso" type="button" name="flip"></button>
         <span class="card__recto" style="--img: var(${card.illustration});"></span>
       </li>`
@@ -49,8 +48,7 @@ function insertCards(deck) {
     cardsHTML.push(
       `<li
         class="card"
-        data-position="${i}"
-        data-id="${card.id}">
+        data-position="${i}">
         <button class="card__verso" type="button" name="flip"></button>
         <span class="card__recto"></span>
       </li>`
