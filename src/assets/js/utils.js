@@ -31,7 +31,7 @@ export function wait(ms = 0) {
 }
 
 // waits for random amount of milliseconds between min and max values to resolve a promise
-export function randomWait(min = 0, max = 500) {
-  const ms = Math.ceil(Math.random() * (max - min) + min);
+export function randomWait(min = 0, max = 500, random = Math.random()) {
+  const ms = Math.ceil(random * (max - min) + min);
   return new Promise((res) => setTimeout(res, ms));
 }
