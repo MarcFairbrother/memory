@@ -25,7 +25,7 @@ function computerFlipsRandomUnknownCard(settings) {
 }
 
 // filters previously known cards array for card matching latest discovered card
-function checkForMatchingCard(previousknowledge, { discovered }) {
+export function checkForMatchingCard(previousknowledge, { discovered }) {
   const latestDiscovered = discovered[discovered.length - 1].name;
   return previousknowledge.filter((card) => card.name === latestDiscovered);
 }
