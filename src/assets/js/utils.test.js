@@ -8,10 +8,9 @@ test('should return first pair of matching objects from an array of objects', ()
 });
 
 // shuffle
-test('should return an array with same values but different order from the source array', () => {
+test('should return an array containing the same values as the source array', () => {
   const data = [1, 2, 3, 4];
   const result = shuffle(data);
-  expect(result).not.toEqual([1, 2, 3, 4]);
   data.forEach((value) => {
     expect(result).toContain(value);
   });
